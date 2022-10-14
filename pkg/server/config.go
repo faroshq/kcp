@@ -343,6 +343,16 @@ func NewConfig(opts *kcpserveroptions.CompletedOptions) (*Config, error) {
 		*c.preHandlerChainMux = append(*c.preHandlerChainMux, mux)
 		apiHandler = mux
 
+		// For library usage we allow to extend the handler chain
+		// with user provided handlers. This allows to add custom
+		// http handlers to the and integrate more tightly with the
+		// kcp server.
+		if len(opts.Extra.AdditionalAPIHandlers) > 0 {
+			for _, h := range opts.Extra.AdditionalAPIHandlers {
+				apiHandler = h(apiHandler)
+			}
+		}
+
 		if kcpfeatures.DefaultFeatureGate.Enabled(kcpfeatures.SyncerTunnel) {
 			apiHandler = tunneler.WithSyncerTunnel(apiHandler)
 		}

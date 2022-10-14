@@ -65,7 +65,8 @@ type ExtraOptions struct {
 	DiscoveryPollInterval    time.Duration
 	ExperimentalBindFreePort bool
 
-	BatteriesIncluded []string
+	BatteriesIncluded     []string
+	AdditionalAPIHandlers []func(h http.Handler) http.HandlerFunc
 }
 
 type completedOptions struct {
