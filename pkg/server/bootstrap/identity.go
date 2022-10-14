@@ -282,7 +282,9 @@ func decorateWildcardPathsWithResourceIdentities(urlPath string, ids *identities
 		if len(id) == 0 {
 			return "", fmt.Errorf("identity for %s is unknown", gr)
 		}
-		comps[5] += ":" + id
+		if !strings.Contains(comps[5], ":") {
+			comps[5] += ":" + id
+		}
 
 		return "/" + path.Join(comps...), nil
 	}
