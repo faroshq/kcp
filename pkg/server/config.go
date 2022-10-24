@@ -105,7 +105,7 @@ type ExtraConfig struct {
 	CacheDynamicClient                  kcpdynamic.ClusterInterface
 
 	// misc
-	preHandlerChainMux   *handlerChainMuxes
+	PreHandlerChainMux   *handlerChainMuxes
 	quotaAdmissionStopCh chan struct{}
 
 	// informers
@@ -327,7 +327,7 @@ func NewConfig(opts *kcpserveroptions.CompletedOptions) (*Config, error) {
 	// preHandlerChainMux is called before the actual handler chain. Note that BuildHandlerChainFunc below
 	// is called multiple times, but only one of the handler chain will actually be used. Hence, we wrap it
 	// to give handlers below one mux.Handle func to call.
-	c.preHandlerChainMux = &handlerChainMuxes{}
+	c.PreHandlerChainMux = &handlerChainMuxes{}
 	c.GenericConfig.BuildHandlerChainFunc = func(apiHandler http.Handler, genericConfig *genericapiserver.Config) (secure http.Handler) {
 		apiHandler = WithWildcardListWatchGuard(apiHandler)
 		apiHandler = WithRequestIdentity(apiHandler)
@@ -363,7 +363,7 @@ func NewConfig(opts *kcpserveroptions.CompletedOptions) (*Config, error) {
 		// that path itself, instead of the rest of the handler chain above handling it.
 		mux := http.NewServeMux()
 		mux.Handle("/", apiHandler)
-		*c.preHandlerChainMux = append(*c.preHandlerChainMux, mux)
+		*c.PreHandlerChainMux = append(*c.PreHandlerChainMux, mux)
 		apiHandler = mux
 
 		if kcpfeatures.DefaultFeatureGate.Enabled(kcpfeatures.SyncerTunnel) {
