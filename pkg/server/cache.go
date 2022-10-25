@@ -60,6 +60,6 @@ func (s *Server) installCacheServer(ctx context.Context) error {
 		return err
 	}
 
-	s.preHandlerChainMux.Handle(virtualcommandoptions.DefaultRootPathPrefix+"/cache/", preparedCacheServer.Handler)
+	s.PreHandlerChainMux.Handle(virtualcommandoptions.DefaultRootPathPrefix+"/cache/", preparedCacheServer.Handler)
 	return nil
 }
