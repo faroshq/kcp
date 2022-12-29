@@ -399,12 +399,12 @@ func (s *Server) Run(ctx context.Context) error {
 		computeBoostraphookName := "rootComputeBoostrap"
 		if err := s.AddPostStartHook(computeBoostraphookName, func(hookContext genericapiserver.PostStartHookContext) error {
 			logger := logger.WithValues("postStartHook", computeBoostraphookName)
-			spew.Dump(s.Options)
-			os.Exit(1)
 			if s.Options.Extra.ShardName == corev1alpha1.RootShard {
 				// the root ws is only present on the root shard
+				spew.Dump(s.Options.Extra.ShardName)
 				logger.Info("waiting to bootstrap root compute workspace until root phase1 is complete")
 				<-s.rootPhase1FinishedCh
+				os.Exit(1)
 
 				logger.Info("starting bootstrapping root compute workspace")
 				if err := configrootcompute.Bootstrap(goContext(hookContext),

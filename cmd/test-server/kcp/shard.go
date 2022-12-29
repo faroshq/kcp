@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/abiosoft/lineprefix"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fatih/color"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -109,6 +110,7 @@ func (s *Shard) Start(ctx context.Context, quiet bool) error {
 	)
 	fmt.Fprintf(out, "running: %v\n", strings.Join(commandLine, " "))
 
+	spew.Dump(commandLine)
 	cmd := exec.CommandContext(ctx, commandLine[0], commandLine[1:]...)
 	if err := os.MkdirAll(filepath.Dir(s.logFilePath), 0755); err != nil {
 		return err
