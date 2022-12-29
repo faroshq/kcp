@@ -20,6 +20,7 @@ import (
 	"context"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"time"
 
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -412,6 +413,7 @@ func (s *Server) Run(ctx context.Context) error {
 					return nil // don't klog.Fatal. This only happens when context is cancelled.
 				}
 				logger.Info("finished bootstrapping root compute workspace")
+				os.Exit(1)
 			}
 			return nil
 		}); err != nil {
