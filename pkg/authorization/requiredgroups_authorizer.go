@@ -49,6 +49,7 @@ func NewRequiredGroupsAuthorizer(logicalClusterLister corev1alpha1listers.Logica
 		getLogicalCluster: func(logicalCluster logicalcluster.Name) (*v1alpha1.LogicalCluster, error) {
 			spew.Dump(logicalCluster)
 			spew.Dump(logicalClusterLister.Cluster(logicalCluster).List(labels.Everything()))
+			spew.Dump(logicalClusterLister.List(labels.Everything()))
 			return logicalClusterLister.Cluster(logicalCluster).Get(v1alpha1.LogicalClusterName)
 		},
 		delegate: delegate,
