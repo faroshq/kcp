@@ -13,7 +13,6 @@ on:
 
 jobs:
   build:
-    if: github.repository_owner == 'kcp-dev'
     name: Build KCP Image
     runs-on: ubuntu-latest
     outputs:
