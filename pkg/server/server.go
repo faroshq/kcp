@@ -23,6 +23,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -398,6 +399,8 @@ func (s *Server) Run(ctx context.Context) error {
 		computeBoostraphookName := "rootComputeBoostrap"
 		if err := s.AddPostStartHook(computeBoostraphookName, func(hookContext genericapiserver.PostStartHookContext) error {
 			logger := logger.WithValues("postStartHook", computeBoostraphookName)
+			spew.Dump(s.Options)
+			os.Exit(1)
 			if s.Options.Extra.ShardName == corev1alpha1.RootShard {
 				// the root ws is only present on the root shard
 				logger.Info("waiting to bootstrap root compute workspace until root phase1 is complete")
