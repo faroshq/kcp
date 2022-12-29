@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -86,6 +87,8 @@ func (a *requiredGroupsAuthorizer) Authorize(ctx context.Context, attr authorize
 		return DelegateAuthorization("service account access to logical cluster", a.delegate).Authorize(ctx, attr)
 
 	case isUser:
+		spew.Dump(attr)
+		spew.Dump(cluster)
 		// get logical cluster with required group annotation
 		this, err := a.getLogicalCluster(cluster.Name)
 		if err != nil {

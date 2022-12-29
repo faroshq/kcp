@@ -19,6 +19,7 @@ package options
 import (
 	kcpkubernetesinformers "github.com/kcp-dev/client-go/informers"
 	"github.com/spf13/pflag"
+	"golang.org/x/net/context"
 
 	"k8s.io/apiserver/pkg/authentication/user"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
@@ -85,6 +86,7 @@ func (s *Authorization) ApplyTo(config *genericapiserver.Config, informer kcpkub
 	var authorizers []authorizer.Authorizer
 
 	workspaceLister := kcpinformer.Core().V1alpha1().LogicalClusters().Lister()
+	kcpinformer.Start(context.TODO().Done())
 
 	// group authorizer
 	if len(s.AlwaysAllowGroups) > 0 {
