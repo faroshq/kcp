@@ -25,6 +25,7 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	authserviceaccount "k8s.io/apiserver/pkg/authentication/serviceaccount"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
@@ -46,6 +47,7 @@ const (
 func NewRequiredGroupsAuthorizer(logicalClusterLister corev1alpha1listers.LogicalClusterClusterLister, delegate authorizer.Authorizer) authorizer.Authorizer {
 	return &requiredGroupsAuthorizer{
 		getLogicalCluster: func(logicalCluster logicalcluster.Name) (*v1alpha1.LogicalCluster, error) {
+			spew.Dump(logicalClusterLister.List(labels.Everything()))
 			return logicalClusterLister.Cluster(logicalCluster).Get(v1alpha1.LogicalClusterName)
 		},
 		delegate: delegate,
