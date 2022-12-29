@@ -404,7 +404,6 @@ func (s *Server) Run(ctx context.Context) error {
 				spew.Dump(s.Options.Extra.ShardName)
 				logger.Info("waiting to bootstrap root compute workspace until root phase1 is complete")
 				<-s.rootPhase1FinishedCh
-				os.Exit(1)
 
 				logger.Info("starting bootstrapping root compute workspace")
 				if err := configrootcompute.Bootstrap(goContext(hookContext),
