@@ -86,7 +86,6 @@ func (s *Authorization) ApplyTo(config *genericapiserver.Config, informer kcpkub
 	var authorizers []authorizer.Authorizer
 
 	workspaceLister := kcpinformer.Core().V1alpha1().LogicalClusters().Lister()
-	kcpinformer.Start(context.TODO().Done())
 
 	// group authorizer
 	if len(s.AlwaysAllowGroups) > 0 {
@@ -125,5 +124,10 @@ func (s *Authorization) ApplyTo(config *genericapiserver.Config, informer kcpkub
 
 	config.RuleResolver = union.NewRuleResolvers(bootstrapRules, localResolver)
 	config.Authorization.Authorizer = union.New(authorizers...)
+
+	ctx := context.Background()
+	kcpinformer.Start(ctx.Done())
+	informer.Start(ctx.Done())
+
 	return nil
 }
