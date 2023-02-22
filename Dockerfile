@@ -19,7 +19,7 @@ FROM --platform=${BUILDPLATFORM} golang:1.19 AS builder
 WORKDIR /workspace
 
 # Install dependencies.
-RUN apt-get update && apt-get install -y jq && mkdir bin
+RUN apt-get update && apt-get install -y jq ca-certificates && mkdir bin
 
 # Run this with docker build --build-arg goproxy=$(go env GOPROXY) to override the goproxy
 ARG goproxy=https://proxy.golang.org
