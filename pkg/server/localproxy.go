@@ -17,8 +17,11 @@ limitations under the License.
 package server
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
@@ -133,12 +136,33 @@ func WithLocalProxy(
 		}
 
 		// lookup in our local, potentially partial index
-		requestShardName, rewrittenClusterName, foundInIndex := indexState.Lookup(path)
-		if foundInIndex && requestShardName != shardName {
-			logger.WithValues("cluster", cluster.Name, "requestedShard", requestShardName, "actualShard", shardName).Info("cluster is not on this shard, but on another")
+
+		r := indexState.Lookup(path)
+		if r.Found && r.Shard != shardName && r.URL == "" {
+			logger.WithValues("cluster", cluster.Name, "requestedShard", r.Shard, "actualShard", shardName).Info("cluster is not on this shard, but on another")
 
 			w.Header().Set("Retry-After", fmt.Sprintf("%d", 1))
 			http.Error(w, "Not found on this shard", http.StatusTooManyRequests)
+			return
+		}
+
+		if r.URL != "" {
+			url, err := url.Parse(r.URL)
+			if err != nil {
+				logger.WithValues("cluster", cluster.Name, "url", r.URL).Error(err, "invalid url")
+				http.Error(w, "invalid url", http.StatusInternalServerError)
+				return
+			}
+			logger.WithValues("from", path, "to", r.URL).V(4).Info("mounting cluster")
+			proxy := httputil.NewSingleHostReverseProxy(url)
+			//TODO(MVP): remove this once we have a real cert wired in dev mode
+			proxy.Transport = &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			}
+
+			proxy.ServeHTTP(w, req)
 			return
 		}
 
@@ -154,10 +178,10 @@ func WithLocalProxy(
 		}
 
 		if foundInIndex {
-			if rewrittenClusterName.Path() != path {
-				logger.WithValues("from", path, "to", rewrittenClusterName).V(4).Info("rewriting cluster")
+			if r.Cluster.Path() != path {
+				logger.WithValues("from", path, "to", r.Cluster).V(4).Info("rewriting cluster")
 			}
-			cluster.Name = rewrittenClusterName
+			cluster.Name = r.Cluster
 		} else {
 			// we check "!isName && !foundInIndex" above. So, here it is a name.
 			cluster.Name = clusterName
