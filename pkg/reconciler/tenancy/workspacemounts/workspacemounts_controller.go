@@ -100,7 +100,7 @@ type workspaceResource = committer.Resource[*tenancyv1alpha1.WorkspaceSpec, *ten
 // Controller watches Workspaces and dynamically discovered mount resources and reconciles them so
 // workspace has right annotations.
 type Controller struct {
-	// queue is the work-queue used by the controller for workspaces
+	// queue is the work-queue used by the controller
 	queue workqueue.RateLimitingInterface
 
 	dynamicClusterClient                    kcpdynamic.ClusterInterface
@@ -198,7 +198,6 @@ func (c *Controller) process(ctx context.Context, key string) (bool, error) {
 		return c.processGVKMount(ctx, strings.TrimPrefix(key, gvrKeyPrefix))
 	}
 	return false, fmt.Errorf("unknown key prefix: %s", key)
-
 }
 
 func (c *Controller) processWorkspace(ctx context.Context, key string) (bool, error) {

@@ -19,12 +19,13 @@ package workspacemounts
 import (
 	"testing"
 
-	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
+
+	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 )
 
 func TestGetWorkspaceKey(t *testing.T) {
@@ -147,7 +148,6 @@ func TestGetGVKKey(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.gvr.String(), func(t *testing.T) {
-
 			key, err := getGVKKey(tt.gvr, tt.obj)
 			if err != nil {
 				if !tt.shouldFail {

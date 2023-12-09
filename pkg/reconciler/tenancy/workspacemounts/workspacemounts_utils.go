@@ -44,7 +44,7 @@ func getWorkspaceKeyFromCluster(cluster logicalcluster.Name, name string) string
 }
 
 // getGVKKey returns a key for the GVK object so we can easily resolve it into GVK using schema.ParseResourceArg
-// Format: prefix::gvr.resource.gvr.version.gvr.group::cluster|namespace/name
+// Format: prefix::gvr.resource.gvr.version.gvr.group::cluster|namespace/name.
 func getGVKKey(gvr schema.GroupVersionResource, obj interface{}) (string, error) {
 	gvkKey := strings.Join([]string{gvr.Resource, gvr.Version, gvr.Group}, ".")
 
