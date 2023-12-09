@@ -30,7 +30,6 @@ import (
 	logsapi "k8s.io/component-base/logs/api/v1"
 )
 
-//nolint:gocritic
 const (
 	// Every feature gate should add method here following this template:
 	//
@@ -40,7 +39,7 @@ const (
 
 	// owner: @mjudeikis
 	// alpha: v0.1
-	// Enables workspace mounts via frontProxy
+	// Enables workspace mounts via frontProxy.
 	WorkspaceMounts featuregate.Feature = "WorkspaceMounts"
 )
 

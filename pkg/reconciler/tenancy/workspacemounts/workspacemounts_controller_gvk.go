@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The KCP Authors.
+Copyright 2024 The KCP Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ func (c *Controller) processNextGVKWorkItem(ctx context.Context) bool {
 	return true
 }
 
+// processGVK processes a single GVK key and looks for mount objects.
 func (c *Controller) processGVK(ctx context.Context, key string) error {
 	logger := klog.FromContext(ctx)
 
@@ -106,7 +107,7 @@ func (c *Controller) processGVK(ctx context.Context, key string) error {
 		return fmt.Errorf("error getting dynamic informer for GVR %q: %w", gvr, err)
 	}
 
-	obj, exists, err := inf.Informer().GetIndexer().GetByKey(key)
+	maybeMountObj, exists, err := inf.Informer().GetIndexer().GetByKey(key)
 	if err != nil {
 		logger.Error(err, "unable to get from indexer")
 		return nil // retrying won't help
@@ -116,33 +117,31 @@ func (c *Controller) processGVK(ctx context.Context, key string) error {
 		return nil
 	}
 
-	u, ok := obj.(*unstructured.Unstructured)
+	u, ok := maybeMountObj.(*unstructured.Unstructured)
 	if !ok {
-		logger.Error(nil, "got unexpected type", "type", fmt.Sprintf("%T", obj))
+		logger.Error(nil, "got unexpected type", "type", fmt.Sprintf("%T", maybeMountObj))
 		return nil // retrying won't help
 	}
+
 	u = u.DeepCopy()
-
-	logger = logging.WithObject(logger, u)
-	ctx = klog.NewContext(ctx, logger)
-
 	if u.GetAnnotations() == nil {
 		return nil
 	}
 
-	// We only care about mount objects
+	// We only care about mount objects. All owner objects must have IsMountAnnotationKey set
+	// to simplify the logic here. And owner annotation to owner workspaces.
 	val, ok := u.GetAnnotations()[tenancyv1alpha1.ExperimentalIsMountAnnotationKey]
 	if !ok || val != "true" {
 		return nil
 	}
 
-	ownerRaw, ok := u.GetAnnotations()[tenancyv1alpha1.ExperimentalWorkspaceOwnerAnnotationKey]
+	workspaceOwnerRaw, ok := u.GetAnnotations()[tenancyv1alpha1.ExperimentalWorkspaceOwnerAnnotationKey]
 	if !ok {
 		return nil
 	}
 
 	var ownerSchema metav1.OwnerReference
-	if err := json.Unmarshal([]byte(ownerRaw), &ownerSchema); err != nil {
+	if err := json.Unmarshal([]byte(workspaceOwnerRaw), &ownerSchema); err != nil {
 		return fmt.Errorf("unable to unmarshal owner reference: %w", err)
 	}
 

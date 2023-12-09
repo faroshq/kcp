@@ -424,7 +424,7 @@ func (s *Server) Run(ctx context.Context) error {
 		if err := s.installWorkspaceScheduler(ctx, controllerConfig, s.LogicalClusterAdminConfig, s.ExternalLogicalClusterAdminConfig); err != nil {
 			return err
 		}
-		if err := s.installWorkspaceMountsScheduler(ctx, controllerConfig, s.LogicalClusterAdminConfig, s.ExternalLogicalClusterAdminConfig); err != nil {
+		if err := s.installWorkspaceMountsScheduler(ctx, controllerConfig); err != nil {
 			return err
 		}
 		if err := s.installTenancyLogicalClusterController(ctx, controllerConfig); err != nil {

@@ -1,12 +1,9 @@
 /*
-Copyright 2021 The KCP Authors.
-
+Copyright 2024 The KCP Authors.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,26 +24,23 @@ import (
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 )
 
-const (
-	// WorkspaceShardHashAnnotationKey keeps track on which shard LogicalCluster must be scheduled. The value
-	// is a base36(sha224) hash of the Shard name.
-	WorkspaceShardHashAnnotationKey = "internal.tenancy.kcp.io/shard"
-)
-
-type schedulingReconciler struct {
+// workspaceStatusUpdater updates the status of the workspace based on the mount status.
+// TODO(mjudeikis): For now this only updates the status of the mount annotation. In the future
+// we should add second reconciler that will update the status of the workspace so triggering
+// it to be "not ready" if the mount is not ready.
+type workspaceStatusUpdater struct {
 	getMountObject func(ctx context.Context, cluster logicalcluster.Path, ref *v1.ObjectReference) (*unstructured.Unstructured, error)
 }
 
-func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancyv1alpha1.Workspace) (reconcileStatus, error) {
-	if workspace.Annotations == nil {
-		workspace.Annotations = map[string]string{}
-	}
+func (r *workspaceStatusUpdater) reconcile(ctx context.Context, workspace *tenancyv1alpha1.Workspace) (reconcileStatus, error) {
 	var mount *tenancyv1alpha1.Mount
-	if v, ok := workspace.Annotations[tenancyv1alpha1.ExperimentalWorkspaceMountAnnotationKey]; ok {
-		var err error
-		mount, err = tenancyv1alpha1.ParseTenancyMountAnnotation(v)
-		if err != nil {
-			return reconcileStatusStopAndRequeue, err
+	if workspace.Annotations != nil {
+		if v, ok := workspace.Annotations[tenancyv1alpha1.ExperimentalWorkspaceMountAnnotationKey]; ok {
+			var err error
+			mount, err = tenancyv1alpha1.ParseTenancyMountAnnotation(v)
+			if err != nil {
+				return reconcileStatusStopAndRequeue, err
+			}
 		}
 	}
 

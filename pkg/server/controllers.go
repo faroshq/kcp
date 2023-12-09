@@ -523,7 +523,8 @@ func (s *Server) installWorkspaceScheduler(ctx context.Context, config *rest.Con
 	})
 }
 
-func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *rest.Config, logicalClusterAdminConfig, externalLogicalClusterAdminConfig *rest.Config) error {
+func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *rest.Config) error {
+
 	// TODO(mjudeikis): Remove this and move to batteries.
 	if !kcpfeatures.DefaultFeatureGate.Enabled(kcpfeatures.WorkspaceMounts) {
 		return nil
@@ -536,33 +537,17 @@ func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *re
 	if err != nil {
 		return err
 	}
-	kubeClusterClient, err := kcpkubernetesclientset.NewForConfig(workspaceConfig)
-	if err != nil {
-		return err
-	}
 
 	dynamicClusterClient, err := kcpdynamic.NewForConfig(workspaceConfig)
 	if err != nil {
 		return err
 	}
 
-	logicalClusterAdminConfig = rest.CopyConfig(logicalClusterAdminConfig)
-	logicalClusterAdminConfig = rest.AddUserAgent(logicalClusterAdminConfig, workspace.ControllerName+"+"+s.Options.Extra.ShardName)
-
-	externalLogicalClusterAdminConfig = rest.CopyConfig(externalLogicalClusterAdminConfig)
-	externalLogicalClusterAdminConfig = rest.AddUserAgent(externalLogicalClusterAdminConfig, workspace.ControllerName+"+"+s.Options.Extra.ShardName)
-
 	workspaceMountsController, err := workspacemounts.NewController(
-		s.Options.Extra.ShardName,
 		kcpClusterClient,
-		kubeClusterClient,
-		logicalClusterAdminConfig,
-		externalLogicalClusterAdminConfig,
 		dynamicClusterClient,
 		s.KcpSharedInformerFactory.Tenancy().V1alpha1().Workspaces(),
-		s.CacheKcpSharedInformerFactory.Core().V1alpha1().Shards(),
-		s.CacheKcpSharedInformerFactory.Tenancy().V1alpha1().WorkspaceTypes(),
-		s.KcpSharedInformerFactory.Core().V1alpha1().LogicalClusters(),
+		s.CacheKcpSharedInformerFactory.Tenancy().V1alpha1().Workspaces(),
 		s.DiscoveringDynamicSharedInformerFactory,
 	)
 	if err != nil {
