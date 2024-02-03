@@ -570,7 +570,6 @@ func (s *Server) installLogicalCluster(ctx context.Context, config *rest.Config)
 
 	logicalClusterController, err := logicalclusterctrl.NewController(
 		s.CompletedConfig.ShardExternalURL,
-		s.CompletedConfig.ShardName,
 		kcpClusterClient,
 		s.KcpSharedInformerFactory.Core().V1alpha1().LogicalClusters(),
 	)
