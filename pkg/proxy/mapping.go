@@ -34,6 +34,7 @@ import (
 
 	"github.com/kcp-dev/kcp/pkg/proxy/index"
 	proxyoptions "github.com/kcp-dev/kcp/pkg/proxy/options"
+	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 // PathMapping describes how to route traffic from a path to a backend server.
