@@ -595,6 +595,7 @@ func (s *Server) installWorkspaceRootRequest(ctx context.Context, config *rest.C
 	controller, err := workspacerootrequests.NewController(
 		kcpClusterClient,
 		s.KcpSharedInformerFactory.Provisioning().V1alpha1().WorkspaceRootRequests(),
+		s.KcpSharedInformerFactory,
 	)
 	if err != nil {
 		return err

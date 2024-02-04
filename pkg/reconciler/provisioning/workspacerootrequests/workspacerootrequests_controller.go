@@ -36,6 +36,7 @@ import (
 	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1"
 	kcpclientset "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster"
 	provisioningv1alpha1client "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/provisioning/v1alpha1"
+	kcpinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions"
 	provisioningv1alpha1informers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/provisioning/v1alpha1"
 	provisioningv1alpha1listers "github.com/kcp-dev/kcp/sdk/client/listers/provisioning/v1alpha1"
 )
@@ -47,6 +48,7 @@ const (
 func NewController(
 	kcpClusterClient kcpclientset.ClusterInterface,
 	workspaceRootRequestInformer provisioningv1alpha1informers.WorkspaceRootRequestClusterInformer,
+	kcpSharedInformerFactory kcpinformers.SharedInformerFactory,
 ) (*Controller, error) {
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
@@ -55,6 +57,7 @@ func NewController(
 		kcpClusterClient:            kcpClusterClient,
 		workspaceRootRequestIndexer: workspaceRootRequestInformer.Informer().GetIndexer(),
 		workspaceRootRequestLister:  workspaceRootRequestInformer.Lister(),
+		workspaceTypeIndexer:        kcpSharedInformerFactory.Tenancy().V1alpha1().WorkspaceTypes().Informer().GetIndexer(),
 		commit:                      committer.NewCommitter[*provisioningv1alpha1.WorkspaceRootRequest, provisioningv1alpha1client.WorkspaceRootRequestInterface, *provisioningv1alpha1.WorkspaceRootRequestSpec, *provisioningv1alpha1.WorkspaceRootRequestStatus](kcpClusterClient.ProvisioningV1alpha1().WorkspaceRootRequests()),
 	}
 	_, _ = workspaceRootRequestInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -77,6 +80,8 @@ type Controller struct {
 
 	workspaceRootRequestIndexer cache.Indexer
 	workspaceRootRequestLister  provisioningv1alpha1listers.WorkspaceRootRequestClusterLister
+
+	workspaceTypeIndexer cache.Indexer
 
 	// commit creates a patch and submits it, if needed.
 	commit func(ctx context.Context, old, new *workspaceRootRequestResource) error

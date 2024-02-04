@@ -1,0 +1,4 @@
+kind: WorkspaceRootRequest
+apiVersion: provisioning.kcp.io/v1alpha1
+metadata:
+  name: test

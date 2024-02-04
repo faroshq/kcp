@@ -19,9 +19,16 @@ package workspacerootrequests
 import (
 	"context"
 
+	"github.com/kcp-dev/logicalcluster/v3"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilserrors "k8s.io/apimachinery/pkg/util/errors"
 
+	"github.com/kcp-dev/kcp/pkg/admission/workspacetypeexists"
+	"github.com/kcp-dev/kcp/pkg/indexers"
+	corev1alpha1 "github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1"
 	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1"
+	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 )
 
 type reconcileStatus int
@@ -35,9 +42,22 @@ type reconciler interface {
 	reconcile(ctx context.Context, request *provisioningv1alpha1.WorkspaceRootRequest) (reconcileStatus, error)
 }
 
+func (c *Controller) getWorkspaceType(path logicalcluster.Path, name string) (*tenancyv1alpha1.WorkspaceType, error) {
+	return indexers.ByPathAndName[*tenancyv1alpha1.WorkspaceType](tenancyv1alpha1.Resource("workspacetypes"), c.workspaceTypeIndexer, path, name)
+}
+
 func (c *Controller) reconcile(ctx context.Context, request *provisioningv1alpha1.WorkspaceRootRequest) (bool, error) {
 	reconcilers := []reconciler{
-		&logicalClusterCreator{},
+		&logicalClusterCreator{
+			getLogicalCluster: func(ctx context.Context, cluster logicalcluster.Name, name string) (*corev1alpha1.LogicalCluster, error) {
+				return c.kcpClusterClient.Cluster(cluster.Path()).CoreV1alpha1().LogicalClusters().Get(ctx, name, metav1.GetOptions{})
+			},
+			createLogicalCluster: func(ctx context.Context, cluster logicalcluster.Name, logicalCluster *corev1alpha1.LogicalCluster) (*corev1alpha1.LogicalCluster, error) {
+				return c.kcpClusterClient.Cluster(cluster.Path()).CoreV1alpha1().LogicalClusters().Create(ctx, logicalCluster, metav1.CreateOptions{})
+			},
+			transitiveTypeResolver: workspacetypeexists.NewTransitiveTypeResolver(c.getWorkspaceType),
+			getWorkspaceType:       c.getWorkspaceType,
+		},
 	}
 
 	var errs []error
