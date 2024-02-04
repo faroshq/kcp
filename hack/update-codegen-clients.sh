@@ -37,6 +37,7 @@ chmod +x "${CODEGEN_PKG}"/generate-internal-groups.sh
 "$GOPATH"/bin/applyconfiguration-gen \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1 \
+  --input-dirs github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/topology/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1 \
@@ -49,6 +50,7 @@ chmod +x "${CODEGEN_PKG}"/generate-internal-groups.sh
 "$GOPATH"/bin/client-gen \
   --input github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1 \
   --input github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1 \
+  --input github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1 \
   --input github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1 \
   --input github.com/kcp-dev/kcp/sdk/apis/topology/v1alpha1 \
   --input-base="" \
@@ -61,7 +63,7 @@ chmod +x "${CODEGEN_PKG}"/generate-internal-groups.sh
 
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy" \
   github.com/kcp-dev/kcp/sdk/client github.com/kcp-dev/kcp/sdk/apis \
-  "core:v1alpha1 tenancy:v1alpha1 apis:v1alpha1 topology:v1alpha1" \
+  "core:v1alpha1 tenancy:v1alpha1 apis:v1alpha1 topology:v1alpha1 provisioning:v1alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kcp-dev/kcp
@@ -121,6 +123,7 @@ go install "${CODEGEN_PKG}"/cmd/openapi-gen
 "$GOPATH"/bin/openapi-gen \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1 \
+  --input-dirs github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/topology/v1alpha1 \
   --input-dirs github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1 \

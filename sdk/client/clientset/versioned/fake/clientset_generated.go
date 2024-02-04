@@ -30,6 +30,8 @@ import (
 	fakeapisv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/apis/v1alpha1/fake"
 	corev1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/core/v1alpha1"
 	fakecorev1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/core/v1alpha1/fake"
+	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/provisioning/v1alpha1"
+	fakeprovisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/provisioning/v1alpha1/fake"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/tenancy/v1alpha1"
 	faketenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/tenancy/v1alpha1/fake"
 	topologyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/topology/v1alpha1"
@@ -94,6 +96,11 @@ func (c *Clientset) ApisV1alpha1() apisv1alpha1.ApisV1alpha1Interface {
 // CoreV1alpha1 retrieves the CoreV1alpha1Client
 func (c *Clientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface {
 	return &fakecorev1alpha1.FakeCoreV1alpha1{Fake: &c.Fake}
+}
+
+// ProvisioningV1alpha1 retrieves the ProvisioningV1alpha1Client
+func (c *Clientset) ProvisioningV1alpha1() provisioningv1alpha1.ProvisioningV1alpha1Interface {
+	return &fakeprovisioningv1alpha1.FakeProvisioningV1alpha1{Fake: &c.Fake}
 }
 
 // TenancyV1alpha1 retrieves the TenancyV1alpha1Client

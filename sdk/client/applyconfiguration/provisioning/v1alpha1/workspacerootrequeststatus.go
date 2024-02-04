@@ -23,24 +23,32 @@ import (
 	conditionsv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1"
 )
 
-// MountStatusApplyConfiguration represents an declarative configuration of the MountStatus type for use
+// WorkspaceRootRequestStatusApplyConfiguration represents an declarative configuration of the WorkspaceRootRequestStatus type for use
 // with apply.
-type MountStatusApplyConfiguration struct {
+type WorkspaceRootRequestStatusApplyConfiguration struct {
+	URL        *string                           `json:"URL,omitempty"`
 	Phase      *v1alpha1.LogicalClusterPhaseType `json:"phase,omitempty"`
 	Conditions *conditionsv1alpha1.Conditions    `json:"conditions,omitempty"`
-	URL        *string                           `json:"url,omitempty"`
 }
 
-// MountStatusApplyConfiguration constructs an declarative configuration of the MountStatus type for use with
+// WorkspaceRootRequestStatusApplyConfiguration constructs an declarative configuration of the WorkspaceRootRequestStatus type for use with
 // apply.
-func MountStatus() *MountStatusApplyConfiguration {
-	return &MountStatusApplyConfiguration{}
+func WorkspaceRootRequestStatus() *WorkspaceRootRequestStatusApplyConfiguration {
+	return &WorkspaceRootRequestStatusApplyConfiguration{}
+}
+
+// WithURL sets the URL field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the URL field is set to the value of the last call.
+func (b *WorkspaceRootRequestStatusApplyConfiguration) WithURL(value string) *WorkspaceRootRequestStatusApplyConfiguration {
+	b.URL = &value
+	return b
 }
 
 // WithPhase sets the Phase field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Phase field is set to the value of the last call.
-func (b *MountStatusApplyConfiguration) WithPhase(value v1alpha1.LogicalClusterPhaseType) *MountStatusApplyConfiguration {
+func (b *WorkspaceRootRequestStatusApplyConfiguration) WithPhase(value v1alpha1.LogicalClusterPhaseType) *WorkspaceRootRequestStatusApplyConfiguration {
 	b.Phase = &value
 	return b
 }
@@ -48,15 +56,7 @@ func (b *MountStatusApplyConfiguration) WithPhase(value v1alpha1.LogicalClusterP
 // WithConditions sets the Conditions field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Conditions field is set to the value of the last call.
-func (b *MountStatusApplyConfiguration) WithConditions(value conditionsv1alpha1.Conditions) *MountStatusApplyConfiguration {
+func (b *WorkspaceRootRequestStatusApplyConfiguration) WithConditions(value conditionsv1alpha1.Conditions) *WorkspaceRootRequestStatusApplyConfiguration {
 	b.Conditions = &value
-	return b
-}
-
-// WithURL sets the URL field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the URL field is set to the value of the last call.
-func (b *MountStatusApplyConfiguration) WithURL(value string) *MountStatusApplyConfiguration {
-	b.URL = &value
 	return b
 }

@@ -42,6 +42,11 @@ const (
 	// alpha: v0.1
 	// Enables workspace mounts via frontProxy
 	WorkspaceMounts featuregate.Feature = "WorkspaceMounts"
+
+	// owner: @mjudeikis
+	// alpha: v0.1
+	// Enables workspace root requests apiexport
+	WorkspaceRootRequests featuregate.Feature = "WorkspaceRootRequests"
 )
 
 // DefaultFeatureGate exposes the upstream feature gate, but with our gate setting applied.
@@ -90,7 +95,8 @@ func (f *kcpFeatureGate) Type() string {
 // in the generic control plane code. To add a new feature, define a key for it above and add it
 // here. The features will be available throughout Kubernetes binaries.
 var defaultGenericControlPlaneFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
-	WorkspaceMounts: {Default: false, PreRelease: featuregate.Alpha},
+	WorkspaceMounts:       {Default: false, PreRelease: featuregate.Alpha},
+	WorkspaceRootRequests: {Default: false, PreRelease: featuregate.Alpha},
 	// inherited features from generic apiserver, relisted here to get a conflict if it is changed
 	// unintentionally on either side:
 	genericfeatures.APIResponseCompression:              {Default: true, PreRelease: featuregate.Beta},

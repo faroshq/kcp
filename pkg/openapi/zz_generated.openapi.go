@@ -74,6 +74,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1.ShardList":                                   schema_sdk_apis_core_v1alpha1_ShardList(ref),
 		"github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1.ShardSpec":                                   schema_sdk_apis_core_v1alpha1_ShardSpec(ref),
 		"github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1.ShardStatus":                                 schema_sdk_apis_core_v1alpha1_ShardStatus(ref),
+		"github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequest":                schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequest(ref),
+		"github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestList":            schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequestList(ref),
+		"github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestSpec":            schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequestSpec(ref),
+		"github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestStatus":          schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequestStatus(ref),
 		"github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1.APIExportReference":                       schema_sdk_apis_tenancy_v1alpha1_APIExportReference(ref),
 		"github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1.Mount":                                    schema_sdk_apis_tenancy_v1alpha1_Mount(ref),
 		"github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1.MountSpec":                                schema_sdk_apis_tenancy_v1alpha1_MountSpec(ref),
@@ -2079,6 +2083,165 @@ func schema_sdk_apis_core_v1alpha1_ShardStatus(ref common.ReferenceCallback) com
 		},
 		Dependencies: []string{
 			"github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1.Condition", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
+func schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequest(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "WorkspaceRootRequest describes the request for root workspace. It is used to create a root workspace for a user.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestSpec", "github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequestStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequestList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "WorkspaceRootRequestList is a list of WorkspaceRootRequest",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequest"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"metadata", "items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1.WorkspaceRootRequest", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequestSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "WorkspaceRootRequestSpec is the specification of the WorkspaceRootRequest resource.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"path": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Path to be used to create",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_sdk_apis_provisioning_v1alpha1_WorkspaceRootRequestStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "WorkspaceRootRequestStatus communicates the observed state of the RootWorkspaceRequest status.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"URL": {
+						SchemaProps: spec.SchemaProps{
+							Description: "url is the address under which the Kubernetes-cluster-like endpoint can be found. This URL can be used to access the logical cluster with standard Kubernetes client libraries and command line tools.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"phase": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Phase of the logical cluster (Initializing, Ready).",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Current processing state of the LogicalCluster.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1.Condition"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1.Condition"},
 	}
 }
 

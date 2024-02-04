@@ -35,6 +35,8 @@ import (
 	fakeapisv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/apis/v1alpha1/fake"
 	kcpcorev1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/core/v1alpha1"
 	fakecorev1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/core/v1alpha1/fake"
+	kcpprovisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/provisioning/v1alpha1"
+	fakeprovisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/provisioning/v1alpha1/fake"
 	kcptenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/tenancy/v1alpha1"
 	faketenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/tenancy/v1alpha1/fake"
 	kcptopologyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/topology/v1alpha1"
@@ -42,6 +44,7 @@ import (
 	clientscheme "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/scheme"
 	apisv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/apis/v1alpha1"
 	corev1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/core/v1alpha1"
+	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/provisioning/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/tenancy/v1alpha1"
 	topologyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/topology/v1alpha1"
 )
@@ -88,6 +91,11 @@ func (c *ClusterClientset) ApisV1alpha1() kcpapisv1alpha1.ApisV1alpha1ClusterInt
 // CoreV1alpha1 retrieves the CoreV1alpha1ClusterClient.
 func (c *ClusterClientset) CoreV1alpha1() kcpcorev1alpha1.CoreV1alpha1ClusterInterface {
 	return &fakecorev1alpha1.CoreV1alpha1ClusterClient{Fake: c.Fake}
+}
+
+// ProvisioningV1alpha1 retrieves the ProvisioningV1alpha1ClusterClient.
+func (c *ClusterClientset) ProvisioningV1alpha1() kcpprovisioningv1alpha1.ProvisioningV1alpha1ClusterInterface {
+	return &fakeprovisioningv1alpha1.ProvisioningV1alpha1ClusterClient{Fake: c.Fake}
 }
 
 // TenancyV1alpha1 retrieves the TenancyV1alpha1ClusterClient.
@@ -140,6 +148,11 @@ func (c *Clientset) ApisV1alpha1() apisv1alpha1.ApisV1alpha1Interface {
 // CoreV1alpha1 retrieves the CoreV1alpha1Client.
 func (c *Clientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface {
 	return &fakecorev1alpha1.CoreV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
+}
+
+// ProvisioningV1alpha1 retrieves the ProvisioningV1alpha1Client.
+func (c *Clientset) ProvisioningV1alpha1() provisioningv1alpha1.ProvisioningV1alpha1Interface {
+	return &fakeprovisioningv1alpha1.ProvisioningV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
 }
 
 // TenancyV1alpha1 retrieves the TenancyV1alpha1Client.

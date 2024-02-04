@@ -32,6 +32,7 @@ import (
 
 	apisv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1"
 	corev1alpha1 "github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1"
+	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 	topologyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/topology/v1alpha1"
 )
@@ -105,6 +106,9 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().LogicalClusters().Informer()}, nil
 	case corev1alpha1.SchemeGroupVersion.WithResource("shards"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Shards().Informer()}, nil
+	// Group=provisioning.kcp.io, Version=V1alpha1
+	case provisioningv1alpha1.SchemeGroupVersion.WithResource("workspacerootrequests"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Provisioning().V1alpha1().WorkspaceRootRequests().Informer()}, nil
 	// Group=tenancy.kcp.io, Version=V1alpha1
 	case tenancyv1alpha1.SchemeGroupVersion.WithResource("workspaces"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Tenancy().V1alpha1().Workspaces().Informer()}, nil
@@ -146,6 +150,10 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case corev1alpha1.SchemeGroupVersion.WithResource("shards"):
 		informer := f.Core().V1alpha1().Shards().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	// Group=provisioning.kcp.io, Version=V1alpha1
+	case provisioningv1alpha1.SchemeGroupVersion.WithResource("workspacerootrequests"):
+		informer := f.Provisioning().V1alpha1().WorkspaceRootRequests().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	// Group=tenancy.kcp.io, Version=V1alpha1
 	case tenancyv1alpha1.SchemeGroupVersion.WithResource("workspaces"):

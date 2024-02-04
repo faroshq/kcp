@@ -16,7 +16,7 @@ kcp:
     - workspace-types
     - metrics-viewer
   extraFlags:
-  - --feature-gates=WorkspaceMounts=true
+  - --feature-gates=WorkspaceMounts=true,WorkspaceRootRequests=true
 kcpFrontProxy:
   v: 8
   # Fake images to trick Tilt to think they are different

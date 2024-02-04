@@ -1,0 +1,9 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: provisioning.kcp.io
+spec:
+  latestResourceSchemas:
+  - v240204-cd965b26c.workspacerootrequests.provisioning.kcp.io
+status: {}

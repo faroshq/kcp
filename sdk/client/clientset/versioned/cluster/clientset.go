@@ -35,6 +35,7 @@ import (
 	client "github.com/kcp-dev/kcp/sdk/client/clientset/versioned"
 	apisv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/apis/v1alpha1"
 	corev1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/core/v1alpha1"
+	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/provisioning/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/tenancy/v1alpha1"
 	topologyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/typed/topology/v1alpha1"
 )
@@ -44,6 +45,7 @@ type ClusterInterface interface {
 	Discovery() discovery.DiscoveryInterface
 	ApisV1alpha1() apisv1alpha1.ApisV1alpha1ClusterInterface
 	CoreV1alpha1() corev1alpha1.CoreV1alpha1ClusterInterface
+	ProvisioningV1alpha1() provisioningv1alpha1.ProvisioningV1alpha1ClusterInterface
 	TenancyV1alpha1() tenancyv1alpha1.TenancyV1alpha1ClusterInterface
 	TopologyV1alpha1() topologyv1alpha1.TopologyV1alpha1ClusterInterface
 }
@@ -51,11 +53,12 @@ type ClusterInterface interface {
 // ClusterClientset contains the clients for groups.
 type ClusterClientset struct {
 	*discovery.DiscoveryClient
-	clientCache      kcpclient.Cache[*client.Clientset]
-	apisV1alpha1     *apisv1alpha1.ApisV1alpha1ClusterClient
-	coreV1alpha1     *corev1alpha1.CoreV1alpha1ClusterClient
-	tenancyV1alpha1  *tenancyv1alpha1.TenancyV1alpha1ClusterClient
-	topologyV1alpha1 *topologyv1alpha1.TopologyV1alpha1ClusterClient
+	clientCache          kcpclient.Cache[*client.Clientset]
+	apisV1alpha1         *apisv1alpha1.ApisV1alpha1ClusterClient
+	coreV1alpha1         *corev1alpha1.CoreV1alpha1ClusterClient
+	provisioningV1alpha1 *provisioningv1alpha1.ProvisioningV1alpha1ClusterClient
+	tenancyV1alpha1      *tenancyv1alpha1.TenancyV1alpha1ClusterClient
+	topologyV1alpha1     *topologyv1alpha1.TopologyV1alpha1ClusterClient
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -74,6 +77,11 @@ func (c *ClusterClientset) ApisV1alpha1() apisv1alpha1.ApisV1alpha1ClusterInterf
 // CoreV1alpha1 retrieves the CoreV1alpha1ClusterClient.
 func (c *ClusterClientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1ClusterInterface {
 	return c.coreV1alpha1
+}
+
+// ProvisioningV1alpha1 retrieves the ProvisioningV1alpha1ClusterClient.
+func (c *ClusterClientset) ProvisioningV1alpha1() provisioningv1alpha1.ProvisioningV1alpha1ClusterInterface {
+	return c.provisioningV1alpha1
 }
 
 // TenancyV1alpha1 retrieves the TenancyV1alpha1ClusterClient.
@@ -143,6 +151,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*ClusterCli
 		return nil, err
 	}
 	cs.coreV1alpha1, err = corev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
+	cs.provisioningV1alpha1, err = provisioningv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}

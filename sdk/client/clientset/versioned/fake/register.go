@@ -27,6 +27,7 @@ import (
 
 	apisv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1"
 	corev1alpha1 "github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1"
+	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 	topologyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/topology/v1alpha1"
 )
@@ -37,6 +38,7 @@ var codecs = serializer.NewCodecFactory(scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
 	apisv1alpha1.AddToScheme,
 	corev1alpha1.AddToScheme,
+	provisioningv1alpha1.AddToScheme,
 	tenancyv1alpha1.AddToScheme,
 	topologyv1alpha1.AddToScheme,
 }

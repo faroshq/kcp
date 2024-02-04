@@ -68,6 +68,7 @@ import (
 	"github.com/kcp-dev/kcp/pkg/reconciler/core/shard"
 	"github.com/kcp-dev/kcp/pkg/reconciler/garbagecollector"
 	"github.com/kcp-dev/kcp/pkg/reconciler/kubequota"
+	"github.com/kcp-dev/kcp/pkg/reconciler/provisioning/workspacerootrequests"
 	"github.com/kcp-dev/kcp/pkg/reconciler/tenancy/bootstrap"
 	"github.com/kcp-dev/kcp/pkg/reconciler/tenancy/initialization"
 	tenancylogicalcluster "github.com/kcp-dev/kcp/pkg/reconciler/tenancy/logicalcluster"
@@ -573,6 +574,36 @@ func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *re
 		Name: workspacemounts.ControllerName,
 		Runner: func(ctx context.Context) {
 			workspaceMountsController.Start(ctx, 2)
+		},
+	})
+}
+
+func (s *Server) installWorkspaceRootRequest(ctx context.Context, config *rest.Config, logicalClusterAdminConfig, externalLogicalClusterAdminConfig *rest.Config) error {
+	// TODO(mjudeikis): Remove this and move to batteries.
+	if !kcpfeatures.DefaultFeatureGate.Enabled(kcpfeatures.WorkspaceRootRequests) {
+		return nil
+	}
+
+	// NOTE: keep `config` unaltered so there isn't cross-use between controllers installed here.
+	workspaceConfig := rest.CopyConfig(config)
+	workspaceConfig = rest.AddUserAgent(workspaceConfig, workspacerootrequests.ControllerName)
+	kcpClusterClient, err := kcpclientset.NewForConfig(workspaceConfig)
+	if err != nil {
+		return err
+	}
+
+	controller, err := workspacerootrequests.NewController(
+		kcpClusterClient,
+		s.KcpSharedInformerFactory.Provisioning().V1alpha1().WorkspaceRootRequests(),
+	)
+	if err != nil {
+		return err
+	}
+
+	return s.registerController(&controllerWrapper{
+		Name: workspacerootrequests.ControllerName,
+		Runner: func(ctx context.Context) {
+			controller.Start(ctx, 2)
 		},
 	})
 }

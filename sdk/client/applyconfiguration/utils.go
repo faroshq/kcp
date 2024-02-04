@@ -24,6 +24,7 @@ import (
 
 	v1alpha1 "github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1"
 	corev1alpha1 "github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1"
+	provisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/provisioning/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 	conditionsv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/apis/conditions/v1alpha1"
 	topologyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/topology/v1alpha1"
@@ -31,6 +32,7 @@ import (
 	applyconfigurationconditionsv1alpha1 "github.com/kcp-dev/kcp/sdk/client/applyconfiguration/conditions/v1alpha1"
 	applyconfigurationcorev1alpha1 "github.com/kcp-dev/kcp/sdk/client/applyconfiguration/core/v1alpha1"
 	metav1 "github.com/kcp-dev/kcp/sdk/client/applyconfiguration/meta/v1"
+	applyconfigurationprovisioningv1alpha1 "github.com/kcp-dev/kcp/sdk/client/applyconfiguration/provisioning/v1alpha1"
 	applyconfigurationtenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/applyconfiguration/tenancy/v1alpha1"
 	applyconfigurationtopologyv1alpha1 "github.com/kcp-dev/kcp/sdk/client/applyconfiguration/topology/v1alpha1"
 )
@@ -130,6 +132,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &metav1.OwnerReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TypeMeta"):
 		return &metav1.TypeMetaApplyConfiguration{}
+
+		// Group=provisioning.kcp.io, Version=v1alpha1
+	case provisioningv1alpha1.SchemeGroupVersion.WithKind("WorkspaceRootRequest"):
+		return &applyconfigurationprovisioningv1alpha1.WorkspaceRootRequestApplyConfiguration{}
+	case provisioningv1alpha1.SchemeGroupVersion.WithKind("WorkspaceRootRequestSpec"):
+		return &applyconfigurationprovisioningv1alpha1.WorkspaceRootRequestSpecApplyConfiguration{}
+	case provisioningv1alpha1.SchemeGroupVersion.WithKind("WorkspaceRootRequestStatus"):
+		return &applyconfigurationprovisioningv1alpha1.WorkspaceRootRequestStatusApplyConfiguration{}
 
 		// Group=tenancy.kcp.io, Version=v1alpha1
 	case tenancyv1alpha1.SchemeGroupVersion.WithKind("APIExportReference"):

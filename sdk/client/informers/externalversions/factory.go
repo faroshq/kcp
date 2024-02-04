@@ -39,6 +39,7 @@ import (
 	apisinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/apis"
 	coreinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/core"
 	"github.com/kcp-dev/kcp/sdk/client/informers/externalversions/internalinterfaces"
+	provisioninginformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/provisioning"
 	tenancyinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/tenancy"
 	topologyinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/topology"
 )
@@ -263,6 +264,7 @@ type SharedInformerFactory interface {
 
 	Apis() apisinformers.ClusterInterface
 	Core() coreinformers.ClusterInterface
+	Provisioning() provisioninginformers.ClusterInterface
 	Tenancy() tenancyinformers.ClusterInterface
 	Topology() topologyinformers.ClusterInterface
 }
@@ -273,6 +275,10 @@ func (f *sharedInformerFactory) Apis() apisinformers.ClusterInterface {
 
 func (f *sharedInformerFactory) Core() coreinformers.ClusterInterface {
 	return coreinformers.New(f, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Provisioning() provisioninginformers.ClusterInterface {
+	return provisioninginformers.New(f, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Tenancy() tenancyinformers.ClusterInterface {
@@ -427,6 +433,7 @@ type SharedScopedInformerFactory interface {
 
 	Apis() apisinformers.Interface
 	Core() coreinformers.Interface
+	Provisioning() provisioninginformers.Interface
 	Tenancy() tenancyinformers.Interface
 	Topology() topologyinformers.Interface
 }
@@ -437,6 +444,10 @@ func (f *sharedScopedInformerFactory) Apis() apisinformers.Interface {
 
 func (f *sharedScopedInformerFactory) Core() coreinformers.Interface {
 	return coreinformers.NewScoped(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedScopedInformerFactory) Provisioning() provisioninginformers.Interface {
+	return provisioninginformers.NewScoped(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedScopedInformerFactory) Tenancy() tenancyinformers.Interface {
