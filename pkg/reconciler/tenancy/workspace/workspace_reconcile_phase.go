@@ -18,6 +18,7 @@ package workspace
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -50,7 +51,7 @@ func (r *phaseReconciler) reconcile(ctx context.Context, workspace *tenancyv1alp
 
 		logicalCluster, err := r.getLogicalCluster(ctx, logicalcluster.NewPath(workspace.Spec.Cluster))
 		if err != nil && !apierrors.IsNotFound(err) {
-			return reconcileStatusStopAndRequeue, err
+			return reconcileStatusStopAndRequeue, fmt.Errorf("failed to get LogicalCluster: %w", err)
 		} else if apierrors.IsNotFound(err) {
 			logger.Info("LogicalCluster disappeared")
 			conditions.MarkFalse(workspace, tenancyv1alpha1.WorkspaceInitialized, tenancyv1alpha1.WorkspaceInitializedWorkspaceDisappeared, conditionsv1alpha1.ConditionSeverityError, "LogicalCluster disappeared")
