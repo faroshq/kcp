@@ -97,7 +97,7 @@ func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancy
 
 		parentThis, err := r.getLogicalCluster(logicalcluster.From(workspace))
 		if err != nil && !apierrors.IsNotFound(err) {
-			return reconcileStatusStopAndRequeue, err
+			return reconcileStatusStopAndRequeue, fmt.Errorf("failed to get parent LogicalCluster: %w", err)
 		} else if apierrors.IsNotFound(err) {
 			return reconcileStatusStopAndRequeue, nil // wait for parent LogicalCluster to be created
 		}
@@ -105,7 +105,7 @@ func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancy
 		if !hasShard {
 			shard, reason, err := r.chooseShardAndMarkCondition(logger, workspace) // call first with status side-effect, before any annotation aka spec change
 			if err != nil {
-				return reconcileStatusStopAndRequeue, err
+				return reconcileStatusStopAndRequeue, fmt.Errorf("failed to choose shard: %w", err)
 			}
 			if shard == nil {
 				conditions.MarkFalse(workspace, tenancyv1alpha1.WorkspaceScheduled, tenancyv1alpha1.WorkspaceReasonUnschedulable, conditionsv1alpha1.ConditionSeverityError, reason)
@@ -124,7 +124,7 @@ func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancy
 		if !hasCluster {
 			cluster, err := r.generateClusterName(logicalcluster.From(workspace).Path().Join(workspace.Name))
 			if err != nil {
-				return reconcileStatusStopAndRequeue, err
+				return reconcileStatusStopAndRequeue, fmt.Errorf("failed to generate cluster name: %w", err)
 			}
 			if workspace.Annotations == nil {
 				workspace.Annotations = map[string]string{}
@@ -146,7 +146,7 @@ func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancy
 				conditions.MarkFalse(workspace, tenancyv1alpha1.WorkspaceScheduled, tenancyv1alpha1.WorkspaceReasonUnschedulable, conditionsv1alpha1.ConditionSeverityError, "chosen shard hash %q does not exist anymore: %v", shardNameHash, err)
 				return reconcileStatusContinue, nil
 			}
-			return reconcileStatusStopAndRequeue, err
+			return reconcileStatusStopAndRequeue, fmt.Errorf("failed to get shard by hash: %w", err)
 		}
 		if valid, reason, message := isValidShard(shard); !valid {
 			conditions.MarkFalse(workspace, tenancyv1alpha1.WorkspaceScheduled, tenancyv1alpha1.WorkspaceReasonUnschedulable, conditionsv1alpha1.ConditionSeverityError, "chosen shard hash %q is no longer valid, reason %q, message %q", shardNameHash, message, reason)
@@ -161,7 +161,7 @@ func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancy
 		}
 
 		if err := r.createLogicalCluster(ctx, shard, clusterName.Path(), canonicalPath, workspace); err != nil && !apierrors.IsAlreadyExists(err) {
-			return reconcileStatusStopAndRequeue, err
+			return reconcileStatusStopAndRequeue, fmt.Errorf("failed to create logical cluster: %w", err)
 		} else if apierrors.IsAlreadyExists(err) {
 			// we have checked in createLogicalCluster that this is a logicalcluster from another owner. Let's choose another cluster name.
 			delete(workspace.Annotations, workspaceClusterAnnotationKey)
@@ -169,14 +169,14 @@ func (r *schedulingReconciler) reconcile(ctx context.Context, workspace *tenancy
 			return reconcileStatusStopAndRequeue, nil
 		}
 		if err := r.updateLogicalClusterPhase(ctx, shard, clusterName.Path(), corev1alpha1.LogicalClusterPhaseInitializing); err != nil {
-			return reconcileStatusStopAndRequeue, err
+			return reconcileStatusStopAndRequeue, fmt.Errorf("failed to update logical cluster phase: %w", err)
 		}
 
 		// now complete the second part of our two-phase commit: set location in workspace
 		u, err := url.Parse(shard.Spec.ExternalURL)
 		if err != nil {
 			conditions.MarkFalse(workspace, tenancyv1alpha1.WorkspaceScheduled, tenancyv1alpha1.WorkspaceReasonReasonUnknown, conditionsv1alpha1.ConditionSeverityError, "Invalid connection information on target Shard: %v.", err)
-			return reconcileStatusStopAndRequeue, err // requeue
+			return reconcileStatusStopAndRequeue, fmt.Errorf("failed to parse shard URL: %w", err) // requeue
 		}
 		u.Path = path.Join(u.Path, canonicalPath.RequestPath())
 		workspace.Spec.Cluster = clusterName.String()
