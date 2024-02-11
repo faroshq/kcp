@@ -115,7 +115,6 @@ type ExtraConfig struct {
 	quotaAdmissionStopCh chan struct{}
 
 	// URL getters depending on genericspiserver.ExternalAddress which is initialized on server run
-	ShardName                func() string
 	ShardBaseURL             func() string
 	ShardExternalURL         func() string
 	ShardVirtualWorkspaceURL func() string
@@ -475,13 +474,6 @@ func NewConfig(opts kcpserveroptions.CompletedOptions) (*Config, error) {
 		kcpadmissioninitializers.NewKubeQuotaConfigurationInitializer(quotaConfiguration),
 		kcpadmissioninitializers.NewServerShutdownInitializer(c.quotaAdmissionStopCh),
 		kcpadmissioninitializers.NewDynamicClusterClientInitializer(c.DynamicClusterClient),
-	}
-
-	c.ShardName = func() string {
-		if opts.Extra.ShardName != "" {
-			return opts.Extra.ShardName
-		}
-		return "root"
 	}
 
 	c.ShardBaseURL = func() string {
