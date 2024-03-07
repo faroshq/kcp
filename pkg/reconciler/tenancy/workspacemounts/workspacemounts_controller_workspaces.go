@@ -50,7 +50,6 @@ func NewController(
 	kcpClusterClient kcpclientset.ClusterInterface,
 	dynamicClusterClient kcpdynamic.ClusterInterface,
 	workspaceInformer tenancyv1alpha1informers.WorkspaceClusterInformer,
-	globalWorkspaceInformer tenancyv1alpha1informers.WorkspaceClusterInformer,
 	discoveringDynamicSharedInformerFactory *informer.DiscoveringDynamicSharedInformerFactory,
 ) (*Controller, error) {
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
@@ -67,9 +66,6 @@ func NewController(
 
 		workspaceIndexer: workspaceInformer.Informer().GetIndexer(),
 		workspaceLister:  workspaceInformer.Lister(),
-
-		globalWorkspaceIndexer: globalWorkspaceInformer.Informer().GetIndexer(),
-		globalWorkspaceLister:  globalWorkspaceInformer.Lister(),
 
 		commit: committer.NewCommitter[*tenancyv1alpha1.Workspace, tenancyv1alpha1client.WorkspaceInterface, *tenancyv1alpha1.WorkspaceSpec, *tenancyv1alpha1.WorkspaceStatus](kcpClusterClient.TenancyV1alpha1().Workspaces()),
 	}
@@ -103,9 +99,6 @@ type Controller struct {
 
 	workspaceIndexer cache.Indexer
 	workspaceLister  tenancyv1alpha1listers.WorkspaceClusterLister
-
-	globalWorkspaceIndexer cache.Indexer
-	globalWorkspaceLister  tenancyv1alpha1listers.WorkspaceClusterLister
 
 	// commit creates a patch and submits it, if needed.
 	commit func(ctx context.Context, new, old *workspaceResource) error

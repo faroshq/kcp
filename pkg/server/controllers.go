@@ -524,7 +524,6 @@ func (s *Server) installWorkspaceScheduler(ctx context.Context, config *rest.Con
 }
 
 func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *rest.Config) error {
-
 	// TODO(mjudeikis): Remove this and move to batteries.
 	if !kcpfeatures.DefaultFeatureGate.Enabled(kcpfeatures.WorkspaceMounts) {
 		return nil
@@ -547,7 +546,6 @@ func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *re
 		kcpClusterClient,
 		dynamicClusterClient,
 		s.KcpSharedInformerFactory.Tenancy().V1alpha1().Workspaces(),
-		s.CacheKcpSharedInformerFactory.Tenancy().V1alpha1().Workspaces(),
 		s.DiscoveringDynamicSharedInformerFactory,
 	)
 	if err != nil {
