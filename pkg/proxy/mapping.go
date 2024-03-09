@@ -26,8 +26,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
