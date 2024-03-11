@@ -28,3 +28,6 @@ tmp
 
 go.work
 go.work.*
+contrib/tilt/bin/cache-server
+contrib/tilt/bin/kcp
+contrib/tilt/bin/kcp-front-proxy
