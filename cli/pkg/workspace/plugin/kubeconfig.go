@@ -267,11 +267,12 @@ func (o *UseWorkspaceOptions) Run(ctx context.Context) error {
 			return fmt.Errorf("current URL %q does not point to a workspace", config.Host)
 		}
 
-		if strings.Contains(o.Name, ":") && cluster.HasPrefix(logicalcluster.NewPath("system")) {
+		switch {
+		case strings.Contains(o.Name, ":") && cluster.HasPrefix(logicalcluster.NewPath("system")):
 			// e.g. system:something
 			u.Path = path.Join(u.Path, cluster.RequestPath())
 			newServerHost = u.String()
-		} else if strings.Contains(o.Name, ":") {
+		case strings.Contains(o.Name, ":"):
 			// e.g. root:something:something
 
 			// first try to get Workspace from parent to potentially get a 404. A 403 in the parent though is
@@ -298,11 +299,11 @@ func (o *UseWorkspaceOptions) Run(ctx context.Context) error {
 
 			u.Path = path.Join(u.Path, cluster.RequestPath())
 			newServerHost = u.String()
-		} else if o.Name == core.RootCluster.String() {
+		case o.Name == core.RootCluster.String():
 			// root workspace
 			u.Path = path.Join(u.Path, cluster.RequestPath())
 			newServerHost = u.String()
-		} else {
+		default:
 			// relative logical cluster, get URL from workspace object in current context
 			ws, err := o.kcpClusterClient.Cluster(currentClusterName).TenancyV1alpha1().Workspaces().Get(ctx, o.Name, metav1.GetOptions{})
 			if err != nil {
