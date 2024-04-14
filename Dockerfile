@@ -35,14 +35,14 @@ RUN wget "https://dl.k8s.io/release/$(go list -m -json k8s.io/kubernetes | jq -r
 
 ENV GOPRIVATE=github.com/faroshq/cluster-proxy
 ARG GH_TOKEN
-# Configure Git to use this token for HTTPS requests to GitHub
-RUN git config --global url."https://".insteadOf git://
-RUN git config --global http.https://github.com/.extraheader "Authorization: bearer ${GH_TOKEN}"
 
-# Cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
+ENV GOPROXY=direct
+
 RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
+    git config --global url."https://${GH_TOKEN}:@github.com/".insteadOf "https://github.com/" && \
+    go mod download && \
+    git config --global --unset url."https://${GH_TOKEN}:@github.com/".insteadOf
 
 # Copy the sources
 COPY ./ ./
