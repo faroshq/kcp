@@ -43,6 +43,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 ENV GOPRIVATE=github.com/faroshq
+RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
 # Copy the sources
 COPY ./ ./
