@@ -44,7 +44,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 ENV GOPRIVATE=github.com/faroshq
 ARG GITHUB_TOKEN
-RUN git config --global http.extraHeader "Authorization: Bearer ${GITHUB_TOKEN}"
+RUN git config --global url."https://".insteadOf git://
+RUN git config --global http.https://github.com/.extraheader "Authorization: bearer ${GITHUB_TOKEN}"
 
 # Copy the sources
 COPY ./ ./
