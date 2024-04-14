@@ -33,15 +33,16 @@ USER 0
 # Install kubectl.
 RUN wget "https://dl.k8s.io/release/$(go list -m -json k8s.io/kubernetes | jq -r .Version)/bin/linux/$(uname -m | sed 's/aarch.*/arm64/;s/armv8.*/arm64/;s/x86_64/amd64/')/kubectl" -O bin/kubectl && chmod +x bin/kubectl
 
+ENV GOPRIVATE=github.com/faroshq/cluster-proxy
+ARG GH_TOKEN
+# Configure Git to use this token for HTTPS requests to GitHub
+RUN git config --global url."https://".insteadOf git://
+RUN git config --global http.https://github.com/.extraheader "Authorization: bearer ${GH_TOKEN}"
+
 # Cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
-
-ENV GOPRIVATE=github.com/faroshq
-ARG GH_TOKEN
-RUN git config --global url."https://".insteadOf git://
-RUN git config --global http.https://github.com/.extraheader "Authorization: bearer ${GH_TOKEN}"
 
 # Copy the sources
 COPY ./ ./
