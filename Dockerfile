@@ -43,7 +43,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 ENV GOPRIVATE=github.com/faroshq
-RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
+ARG GITHUB_TOKEN
+RUN git config --global http.extraHeader "Authorization: Bearer ${GITHUB_TOKEN}"
 
 # Copy the sources
 COPY ./ ./
