@@ -11,13 +11,13 @@ require (
 	github.com/egymgmbh/go-prefix-writer v0.0.0-20180609083313-7326ea162eca
 	github.com/emicklei/go-restful/v3 v3.11.0
 	github.com/evanphx/json-patch v5.6.0+incompatible
+	github.com/faroshq/cluster-proxy v0.0.59
 	github.com/fatih/color v1.15.0
 	github.com/go-logr/logr v1.3.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.3.1
 	github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0.0.20230926071920-57d168bcbe34
 	github.com/kcp-dev/client-go v0.0.0-20230927101349-0416c830e3b1
-	github.com/kcp-dev/cluster-proxy v0.0.0-00010101000000-000000000000
 	github.com/kcp-dev/kcp/cli v0.0.0-00010101000000-000000000000
 	github.com/kcp-dev/kcp/sdk v0.0.0-20240309151601-39c8843525c4
 	github.com/kcp-dev/logicalcluster/v3 v3.0.5
@@ -180,7 +180,7 @@ require (
 replace github.com/google/cel-go => github.com/google/cel-go v0.16.1
 
 replace (
-	github.com/kcp-dev/cluster-proxy => ../cluster-proxy
+	//github.com/kcp-dev/cluster-proxy => ../cluster-proxy
 	github.com/kcp-dev/kcp/cli => ./cli
 	github.com/kcp-dev/kcp/sdk => ./sdk
 	k8s.io/api => github.com/kcp-dev/kubernetes/staging/src/k8s.io/api v0.0.0-20231008123256-10a06602223e
