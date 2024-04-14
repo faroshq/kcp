@@ -1,6 +1,6 @@
 module github.com/kcp-dev/kcp
 
-go 1.21
+go 1.20
 
 require (
 	connectrpc.com/connect v1.16.0
