@@ -21,10 +21,6 @@ WORKDIR /workspace
 # Install dependencies.
 RUN apt-get update && apt-get install -y jq && mkdir bin
 
-# Run this with docker build --build-arg goproxy=$(go env GOPROXY) to override the goproxy
-ARG goproxy=https://proxy.golang.org
-ENV GOPROXY=$goproxy
-
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
