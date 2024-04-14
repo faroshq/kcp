@@ -42,6 +42,8 @@ RUN wget "https://dl.k8s.io/release/$(go list -m -json k8s.io/kubernetes | jq -r
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
+ENV GOPRIVATE=github.com/faroshq
+
 # Copy the sources
 COPY ./ ./
 
