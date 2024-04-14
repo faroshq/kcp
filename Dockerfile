@@ -41,8 +41,7 @@ ENV GOPROXY=direct
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     git config --global url."https://${GH_TOKEN}:@github.com/".insteadOf "https://github.com/" && \
-    go mod download && \
-    git config --global --unset url."https://${GH_TOKEN}:@github.com/".insteadOf
+    go mod download
 
 # Copy the sources
 COPY ./ ./
