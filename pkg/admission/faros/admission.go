@@ -34,8 +34,8 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions"
 	corev1alpha1listers "github.com/kcp-dev/kcp/sdk/client/listers/core/v1alpha1"
 
-	quotav1alpha1 "github.com/kcp-dev/cluster-proxy/apiserver/grpc/gen/private/faros/quota/v1alpha1"
-	"github.com/kcp-dev/cluster-proxy/apiserver/grpc/gen/private/faros/quota/v1alpha1/quotav1alpha1connect"
+	quotav1alpha1 "github.com/faroshq/cluster-proxy/apiserver/grpc/gen/private/faros/quota/v1alpha1"
+	"github.com/faroshq/cluster-proxy/apiserver/grpc/gen/private/faros/quota/v1alpha1/quotav1alpha1connect"
 )
 
 // Validate and admit Workspace creation and updates for quota.
