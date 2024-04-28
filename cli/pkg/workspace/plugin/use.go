@@ -302,6 +302,9 @@ func (o *UseWorkspaceOptions) swapContexts(ctx context.Context, currentContext *
 
 	bindings, err := o.getAPIBindings(ctx, o.kcpClusterClient, newServerHost)
 	if err != nil {
+		if apierrors.IsNotFound(err) { // no apibindings in the workspace, nothing to check
+			return newServerHost, nil
+		}
 		// display the error, but don't stop the current workspace from being reported.
 		fmt.Fprintf(o.ErrOut, "error checking APIBindings: %v\n", err)
 	}
@@ -344,6 +347,9 @@ func (o *UseWorkspaceOptions) commitConfig(ctx context.Context, currentContext *
 
 	bindings, err := o.getAPIBindings(ctx, o.kcpClusterClient, u.String())
 	if err != nil {
+		if apierrors.IsNotFound(err) { // no apibindings in the workspace, nothing to check
+			return printCurrentWorkspace(o.Out, u.String(), shortWorkspaceOutput(o.ShortWorkspaceOutput), workspaceType)
+		}
 		// display the error, but don't stop the current workspace from being reported.
 		fmt.Fprintf(o.ErrOut, "error checking APIBindings: %v\n", err)
 	}
