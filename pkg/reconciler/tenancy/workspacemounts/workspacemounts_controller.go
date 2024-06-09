@@ -75,8 +75,8 @@ func NewController(
 	}
 
 	_, _ = workspaceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(obj interface{}) { c.enqueueWorkspace(obj) },
-		UpdateFunc: func(_, obj interface{}) { c.enqueueWorkspace(obj) },
+		AddFunc:    func(obj interface{}) { c.enqueueWorkspace(nil, obj) },
+		UpdateFunc: func(old, new interface{}) { c.enqueueWorkspace(old, new) },
 	})
 
 	c.discoveringDynamicSharedInformerFactory.AddEventHandler(informer.GVREventHandlerFuncs{
@@ -107,12 +107,13 @@ type Controller struct {
 }
 
 // enqueueWorkspace adds the object to the work queue.
-func (c *Controller) enqueueWorkspace(obj interface{}) {
+func (c *Controller) enqueueWorkspace(nil, obj interface{}) {
 	key, err := kcpcache.MetaClusterNamespaceKeyFunc(obj)
 	if err != nil {
 		runtime.HandleError(err)
 		return
 	}
+
 	logger := logging.WithQueueKey(logging.WithReconciler(klog.Background(), ControllerName), key)
 	logger.V(4).Info("queueing Workspace")
 	c.queue.Add(key)

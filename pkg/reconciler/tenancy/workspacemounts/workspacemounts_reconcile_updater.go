@@ -47,6 +47,11 @@ func (r *workspaceStatusUpdater) reconcile(ctx context.Context, workspace *tenan
 			if err != nil {
 				return reconcileStatusStopAndRequeue, err
 			}
+		} else {
+			// no mount annotation, might be nothing or mount was soft "deleted" by removing the annotation
+			// Delete the condition
+			conditions.Delete(workspace, tenancyv1alpha1.MountConditionReady)
+			return reconcileStatusContinue, nil
 		}
 	}
 
