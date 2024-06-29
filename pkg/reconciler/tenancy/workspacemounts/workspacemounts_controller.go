@@ -18,7 +18,6 @@ package workspacemounts
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -27,7 +26,6 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -216,22 +214,16 @@ func (c *Controller) enqueuePotentiallyMountResource(obj interface{}) {
 		return
 	}
 
-	workspaceOwnerRaw, ok := u.GetAnnotations()[tenancyv1alpha1.ExperimentalMountWorkspaceAnnotationKey]
-	if !ok {
+	owners := u.GetOwnerReferences()
+	if len(owners) == 0 {
 		return
 	}
 
-	var owner metav1.OwnerReference
-	if err := json.Unmarshal([]byte(workspaceOwnerRaw), &owner); err != nil {
-		runtime.HandleError(fmt.Errorf("unable to unmarshal owner reference: %w", err))
-		return
+	for _, owner := range owners {
+		if owner.Kind == tenancy.WorkspaceKind {
+			// queue workspace
+			key := kcpcache.ToClusterAwareKey(logicalcluster.From(u).String(), "", owner.Name)
+			c.queue.Add(key)
+		}
 	}
-	if owner.Kind != tenancy.WorkspaceKind {
-		runtime.HandleError(fmt.Errorf("owner reference is not a workspace: %s", owner.Kind))
-		return
-	}
-
-	// queue workspace
-	key := kcpcache.ToClusterAwareKey(logicalcluster.From(u).String(), "", owner.Name)
-	c.queue.Add(key)
 }
