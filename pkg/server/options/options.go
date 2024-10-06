@@ -25,6 +25,7 @@ import (
 
 	"github.com/spf13/pflag"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
 	cliflag "k8s.io/component-base/cli/flag"
@@ -251,7 +252,7 @@ func (o *Options) Complete(rootDir string) (*CompletedOptions, error) {
 		o.EmbeddedEtcd.Enabled = true
 	}
 
-	o.GenericControlPlane.SystemNamespaces = []string{}
+	o.GenericControlPlane.SystemNamespaces = []string{metav1.NamespaceDefault, metav1.NamespaceSystem}
 
 	var err error
 	if !filepath.IsAbs(o.EmbeddedEtcd.Directory) {
