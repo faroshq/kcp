@@ -106,7 +106,7 @@ namespace_create('kcp-alpha')
 namespace_create('kcp-beta')
 if not os.path.exists('kcp-helm-charts'):
   git_checkout(
-    'https://github.com/kcp-dev/helm-charts',
+    'https://github.com/mjudeikis/helm-charts#faros.20240501',
     'kcp-helm-charts'
   )
 

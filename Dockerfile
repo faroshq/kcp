@@ -21,10 +21,6 @@ WORKDIR /workspace
 # Install dependencies.
 RUN apt-get update && apt-get install -y jq && mkdir bin
 
-# Run this with docker build --build-arg goproxy=$(go env GOPROXY) to override the goproxy
-ARG goproxy=https://proxy.golang.org
-ENV GOPROXY=$goproxy
-
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
@@ -37,10 +33,16 @@ USER 0
 # Install kubectl.
 RUN wget "https://dl.k8s.io/release/$(go list -m -json k8s.io/kubernetes | jq -r .Version)/bin/linux/$(uname -m | sed 's/aarch.*/arm64/;s/armv8.*/arm64/;s/x86_64/amd64/')/kubectl" -O bin/kubectl && chmod +x bin/kubectl
 
-# Cache deps before building and copying source so that we don't need to re-download as much
+ENV GOPRIVATE=github.com/faroshq/cluster-proxy
+ARG GH_TOKEN
+
 # and so that source changes don't invalidate our downloaded layer
+ENV GOPROXY=direct
+
 RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
+    git config --global url."https://${GH_TOKEN}:@github.com/".insteadOf "https://github.com/" && \
+    go mod download && \
+    git config --global --unset url."https://${GH_TOKEN}:@github.com/".insteadOf
 
 # Copy the sources
 COPY ./ ./
