@@ -59,7 +59,7 @@ func NewControllers() *Controllers {
 		EnableAll: true,
 
 		EnableLeaderElection:    false,
-		LeaderElectionNamespace: metav1.NamespaceSystem,
+		LeaderElectionNamespace: metav1.NamespaceDefault,
 		LeaderElectionName:      "kcp-controllers",
 
 		SAController: *kcmDefaults.SAController,
