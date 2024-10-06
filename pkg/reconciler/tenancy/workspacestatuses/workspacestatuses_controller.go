@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package workspacemounts
+package workspacestatuses
 
 import (
 	"context"
@@ -23,11 +23,8 @@ import (
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -35,11 +32,8 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/kcp/pkg/informer"
 	"github.com/kcp-dev/kcp/pkg/logging"
 	"github.com/kcp-dev/kcp/pkg/reconciler/committer"
-	"github.com/kcp-dev/kcp/pkg/reconciler/events"
-	tenancy "github.com/kcp-dev/kcp/sdk/apis/tenancy"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
 	kcpclientset "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster"
 	tenancyv1alpha1client "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/tenancy/v1alpha1"
@@ -49,7 +43,7 @@ import (
 
 const (
 	// ControllerName is the name of this controller.
-	ControllerName = "kcp-workspace-mounts"
+	ControllerName = "kcp-workspace-statuses"
 )
 
 // NewController creates a new controller for generic mounts.
@@ -57,18 +51,13 @@ func NewController(
 	kcpClusterClient kcpclientset.ClusterInterface,
 	dynamicClusterClient kcpdynamic.ClusterInterface,
 	workspaceInformer tenancyv1alpha1informers.WorkspaceClusterInformer,
-	discoveringDynamicSharedInformerFactory *informer.DiscoveringDynamicSharedInformerFactory,
 ) (*Controller, error) {
-	c := &Controller{
-		queue: workqueue.NewTypedRateLimitingQueueWithConfig(
-			workqueue.DefaultTypedControllerRateLimiter[string](),
-			workqueue.TypedRateLimitingQueueConfig[string]{
-				Name: ControllerName,
-			},
-		),
+	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
-		dynamicClusterClient:                    dynamicClusterClient,
-		discoveringDynamicSharedInformerFactory: discoveringDynamicSharedInformerFactory,
+	c := &Controller{
+		queue: queue,
+
+		dynamicClusterClient: dynamicClusterClient,
 
 		workspaceIndexer: workspaceInformer.Informer().GetIndexer(),
 		workspaceLister:  workspaceInformer.Lister(),
@@ -77,29 +66,23 @@ func NewController(
 	}
 
 	_, _ = workspaceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(obj interface{}) { c.enqueueWorkspace(nil, obj) },
-		UpdateFunc: func(old, new interface{}) { c.enqueueWorkspace(old, new) },
+		AddFunc:    func(obj interface{}) { c.enqueueWorkspace(obj) },
+		UpdateFunc: func(_, obj interface{}) { c.enqueueWorkspace(obj) },
 	})
-
-	c.discoveringDynamicSharedInformerFactory.AddEventHandler(events.WithoutGVRSyncs(informer.GVREventHandlerFuncs{
-		AddFunc:    func(_ schema.GroupVersionResource, obj interface{}) { c.enqueuePotentiallyMountResource(obj) },
-		UpdateFunc: func(_ schema.GroupVersionResource, _, obj interface{}) { c.enqueuePotentiallyMountResource(obj) },
-		DeleteFunc: nil, // Nothing to do.
-	}))
 
 	return c, nil
 }
 
 type workspaceResource = committer.Resource[*tenancyv1alpha1.WorkspaceSpec, *tenancyv1alpha1.WorkspaceStatus]
 
-// Controller watches Workspaces and dynamically discovered mount resources and reconciles them so
-// workspace has right annotations.
+// Controller watches Workspaces and checks conditions. If a condition is not ready,
+// it will flip workspace status to "NotReady". If all conditions are ready, it will
+// flip workspace status to "Ready".
 type Controller struct {
 	// queue is the work-queue used by the controller
-	queue workqueue.TypedRateLimitingInterface[string]
+	queue workqueue.RateLimitingInterface
 
-	dynamicClusterClient                    kcpdynamic.ClusterInterface
-	discoveringDynamicSharedInformerFactory *informer.DiscoveringDynamicSharedInformerFactory
+	dynamicClusterClient kcpdynamic.ClusterInterface
 
 	workspaceIndexer cache.Indexer
 	workspaceLister  tenancyv1alpha1listers.WorkspaceClusterLister
@@ -109,13 +92,12 @@ type Controller struct {
 }
 
 // enqueueWorkspace adds the object to the work queue.
-func (c *Controller) enqueueWorkspace(nil, obj interface{}) {
+func (c *Controller) enqueueWorkspace(obj interface{}) {
 	key, err := kcpcache.MetaClusterNamespaceKeyFunc(obj)
 	if err != nil {
 		runtime.HandleError(err)
 		return
 	}
-
 	logger := logging.WithQueueKey(logging.WithReconciler(klog.Background(), ControllerName), key)
 	logger.V(4).Info("queueing Workspace")
 	c.queue.Add(key)
@@ -148,7 +130,7 @@ func (c *Controller) processNextWorkItem(ctx context.Context) bool {
 	if quit {
 		return false
 	}
-	key := k
+	key := k.(string)
 
 	logger := logging.WithQueueKey(klog.FromContext(ctx), key)
 	ctx = klog.NewContext(ctx, logger)
@@ -205,29 +187,4 @@ func (c *Controller) process(ctx context.Context, key string) (bool, error) {
 	}
 
 	return requeue, utilerrors.NewAggregate(errs)
-}
-
-// enqueuePotentiallyMountResource looks for workspaces referencing this kind.
-func (c *Controller) enqueuePotentiallyMountResource(obj interface{}) {
-	u := obj.(*unstructured.Unstructured)
-
-	// We only care about mount objects. All owner objects must have IsMountAnnotationKey set
-	// to simplify the logic here. And owner annotation to owner workspaces.
-	val, ok := u.GetAnnotations()[tenancyv1alpha1.ExperimentalIsMountAnnotationKey]
-	if !ok || val != "true" {
-		return
-	}
-
-	owners := u.GetOwnerReferences()
-	if len(owners) == 0 {
-		return
-	}
-
-	for _, owner := range owners {
-		if owner.Kind == tenancy.WorkspaceKind {
-			// queue workspace
-			key := kcpcache.ToClusterAwareKey(logicalcluster.From(u).String(), "", owner.Name)
-			c.queue.Add(key)
-		}
-	}
 }
