@@ -251,6 +251,8 @@ func (o *Options) Complete(rootDir string) (*CompletedOptions, error) {
 		o.EmbeddedEtcd.Enabled = true
 	}
 
+	o.GenericControlPlane.SystemNamespaces = []string{}
+
 	var err error
 	if !filepath.IsAbs(o.EmbeddedEtcd.Directory) {
 		o.EmbeddedEtcd.Directory, err = filepath.Abs(o.EmbeddedEtcd.Directory)
