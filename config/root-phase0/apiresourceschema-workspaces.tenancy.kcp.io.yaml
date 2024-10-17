@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v240408-678f36869.workspaces.tenancy.kcp.io
+  name: v241025-ea15fd9d4.workspaces.tenancy.kcp.io
 spec:
   group: tenancy.kcp.io
   names:
@@ -249,7 +249,7 @@ spec:
               - Scheduling
               - Initializing
               - Ready
-              - NotReady
+              - Unavailable
               type: string
           type: object
       required:
