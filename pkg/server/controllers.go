@@ -698,6 +698,10 @@ func (s *Server) installWorkspaceMountsScheduler(ctx context.Context, config *re
 }
 
 func (s *Server) installWorkspaceStatusesScheduler(ctx context.Context, config *rest.Config) error {
+	// TODO(mjudeikis): Remove this and move to batteries.
+	if !kcpfeatures.DefaultFeatureGate.Enabled(kcpfeatures.WorkspaceMounts) {
+		return nil
+	}
 	// NOTE: keep `config` unaltered so there isn't cross-use between controllers installed here.
 	workspaceConfig := rest.CopyConfig(config)
 	workspaceConfig = rest.AddUserAgent(workspaceConfig, workspacestatuses.ControllerName)
