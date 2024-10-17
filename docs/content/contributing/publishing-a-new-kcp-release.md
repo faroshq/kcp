@@ -29,7 +29,7 @@ kcp has 2 go modules, and a unique tag is needed for each module every time we c
 
     ```shell
     REF=upstream/main
-    TAG=v1.2.3
+    TAG=v0.26.0
     git tag --sign --message "$TAG" "$TAG" "$REF"
     ```
 
@@ -37,15 +37,15 @@ kcp has 2 go modules, and a unique tag is needed for each module every time we c
 
     ```shell
     REF=upstream/main
-    TAG=v1.2.3
+    TAG=v0.26.0
     git tag --sign --message "sdk/$TAG" "sdk/$TAG" "$REF"
     ```
-    
+
 4. Tag the `cli` module, following the same logic as above for `REF` and `TAG`
 
     ```shell
     REF=upstream/main
-    TAG=v1.2.3
+    TAG=v0.26.0
     git tag --sign --message "cli/$TAG" "cli/$TAG" "$REF"
     ```
 
@@ -53,7 +53,7 @@ kcp has 2 go modules, and a unique tag is needed for each module every time we c
 
 ```shell
 REMOTE=upstream
-TAG=v1.2.3
+TAG=v0.26.0
 git push "$REMOTE" "$TAG" "sdk/$TAG" "cli/$TAG"
 ```
 
@@ -71,7 +71,7 @@ Set `REMOTE`, `REF`, and `VERSION` as appropriate.
 ```shell
 REMOTE=upstream
 REF="$REMOTE/main"
-VERSION=1.2
+VERSION=0.26
 git checkout -b "release-$VERSION" "$REF"
 git push "$REMOTE" "release-$VERSION"
 ```
@@ -91,8 +91,8 @@ To use `release-notes` you will need to generate a GitHub API token (Settings ->
 Then, run run the `release-notes` tool (set `PREV_VERSION` to the version released before the one you have just released).
 
 ```shell
-TAG=v1.2.3
-PREV_TAG=v1.2.2
+TAG=v0.26.0
+PREV_TAG=v0.25.0
 release-notes \
   --required-author='' \
   --org kcp-dev \
@@ -100,7 +100,7 @@ release-notes \
   --branch main \
   --start-rev $PREV_TAG \
   --end-rev $TAG \
-  --output CHANGELOG.md 
+  --output CHANGELOG.md
 ```
 
 Don't commit the `CHANGELOG.md` to the repository, just keep it around to update the release on GitHub (next step).
