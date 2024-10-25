@@ -31,7 +31,7 @@ type workspacePhaseUpdater struct{}
 func (r *workspacePhaseUpdater) reconcile(ctx context.Context, workspace *tenancyv1alpha1.Workspace) (reconcileStatus, error) {
 	for _, c := range workspace.Status.Conditions {
 		if c.Status != v1.ConditionTrue {
-			workspace.Status.Phase = corev1alpha1.LogicalClusterPhaseNotReady
+			workspace.Status.Phase = corev1alpha1.LogicalClusterPhaseUnavailable
 			return reconcileStatusContinue, nil
 		}
 	}
